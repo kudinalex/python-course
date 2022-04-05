@@ -7,7 +7,7 @@ file = open('slova.json', 'r', encoding='utf-8')
 word_rus = json.load(file)
 file.close()
 critical_trie = 6
-token = '5188285015:AAEVPBMesbRY4jhnly7d1NRt6mPg0R8Df1U'
+token = TOKEN
 bot = telebot.TeleBot(token)
 
 
@@ -81,24 +81,7 @@ def slovoo1(s):
 @bot.message_handler(commands=['2'])
 def gamemode2(message):
     markup2 = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    item1 = types.KeyboardButton('3')
-    item2 = types.KeyboardButton('4')
-    item3 = types.KeyboardButton('5')
-    item4 = types.KeyboardButton('6')
-    item5 = types.KeyboardButton('7')
-    item6 = types.KeyboardButton('8')
-    item7 = types.KeyboardButton('9')
-    item8 = types.KeyboardButton('10')
-    item9 = types.KeyboardButton('11')
-    item10 = types.KeyboardButton('12')
-    item11 = types.KeyboardButton('13')
-    item12 = types.KeyboardButton('14')
-    item13 = types.KeyboardButton('15')
-    item14 = types.KeyboardButton('16')
-    item15 = types.KeyboardButton('17')
-
-    markup2.add(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14,
-                item15)
+    markup2.add(*[types.KeyboardButton(i) for i in range(3, 18)])
     msg = bot.send_message(message.chat.id, 'Выберите длину загадываемого слова',
                    parse_mode='html', reply_markup=markup2)
     bot.register_next_step_handler(msg, lening)
@@ -112,6 +95,8 @@ def lening(message):
     str_conceived_word = ''
     len_of_word = len(conceived_word)
     critical_trie = 10
+    if len_of_word < 8:
+        critical_trie = 6
     if 12 > len_of_word >= 8:
         critical_trie = 7
     if 14 > len_of_word >= 12:
