@@ -7,7 +7,7 @@ file = open('slova.json', 'r', encoding='utf-8')
 word_rus = json.load(file)
 file.close()
 critical_trie = 6
-token = TOKEN
+token = '5188285015:AAEVPBMesbRY4jhnly7d1NRt6mPg0R8Df1U'
 bot = telebot.TeleBot(token)
 
 
