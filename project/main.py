@@ -11,23 +11,19 @@ token = '5188285015:AAEVPBMesbRY4jhnly7d1NRt6mPg0R8Df1U'
 bot = telebot.TeleBot(token)
 
 
-
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     item1 = types.KeyboardButton('/1')
     item2 = types.KeyboardButton('/2')
-    item3 = types.KeyboardButton('/rules')
 
-    markup.add(item1, item2, item3)
+    markup.add(item1, item2)
 
     bot.send_message(message.chat.id,
-                     "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, Вы хотите играть с определением слова или наугад? Выберите /1, если Вы хотите играть с определением и /2, если Вы хотите играть без определения, если вы хотите ознакомиться более подробно с правилами, то выберите /rules.".format(message.from_user, bot.get_me()),
+                     "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, Вы хотите играть с определением слова или наугад? Выберите /1, если Вы хотите играть с определением и /2, если Вы хотите играть без определения.".format(message.from_user, bot.get_me()),
                      parse_mode='html', reply_markup=markup)
 
-@bot.message_handler(commands=['rules'])
-def rules(message):
-    bot.send_message(message.chat.id, 'В игре есть два режима игры, первый режим предполагает собой загадывание слова на определенную тему, давая при этом определение этого слова, для отгадывания слова дается 3 попытки. Второй режим предполагает отгадывание слова наугад по букве, количество попыток зависит от длины слова, напишите /start, если вы хотите начать игру')
+
 @bot.message_handler(commands=['1'])
 def first(message):
     markup1 = types.ReplyKeyboardMarkup(one_time_keyboard=True)
