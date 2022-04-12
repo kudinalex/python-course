@@ -7,9 +7,11 @@ file = open('slova.json', 'r', encoding='utf-8')
 word_rus = json.load(file)
 file.close()
 critical_trie = 6
-token = '5188285015:AAEVPBMesbRY4jhnly7d1NRt6mPg0R8Df1U'
-bot = telebot.TeleBot(token)
-
+with open('TOKEN.txt','r',encoding = 'utf-8') as tok:
+    token = tok.readline()
+    token = token[0:-1]
+    bot = telebot.TeleBot(token)
+    tok.close()
 
 
 @bot.message_handler(commands=['start'])
