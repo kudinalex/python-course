@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import constants
+import json
+import random
 import telebot
-import random, json, constants
 from telebot import types
 
 file = open('slova.json', 'r', encoding='utf-8')
@@ -70,24 +72,26 @@ def opredelenie(message):
         tries = 3
         msg = bot.send_message(message.chat.id, defenition, parse_mode='html')
         bot.register_next_step_handler(msg, slovoo1)
-def slovoo1(s):
+def slovoo1(message):
     global tries
-    if s.text.lower() == slovo.lower():
-        bot.send_message(s.chat.id, 'Вы выиграли!')
+    if message.text.lower() == slovo.lower():
+        bot.send_message(message.chat.id, 'Вы выиграли!')
+        restart(message)
     else:
         tries -= 1
         if tries == 0:
-            bot.send_message(s.chat.id, f'Вы проиграли, это было слово "{slovo}"')
+            bot.send_message(message.chat.id, f'Вы проиграли, это было слово "{slovo}"')
+            restart(message)
         if tries == 1:
-            msg = bot.send_message(s.chat.id, f'Вы не угадали, у Вас еще {tries} попытка')
+            msg = bot.send_message(message.chat.id, f'Вы не угадали, у Вас еще {tries} попытка')
         if tries != 1 and tries != 0:
-            msg = bot.send_message(s.chat.id, f'Вы не угадали, у Вас еще {tries} попытки')
+            msg = bot.send_message(message.chat.id, f'Вы не угадали, у Вас еще {tries} попытки')
         if tries != 0:
             bot.register_next_step_handler(msg, slovoo1)
 @bot.message_handler(commands=['2'])
 def gamemode2(message):
     markup2 = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    markup2.add(*[types.KeyboardButton(i) for i in range(3, 18)])
+    markup2.add(*[types.KeyboardButton(i) for i in range(3, 17)])
     msg = bot.send_message(message.chat.id, 'Выберите длину загадываемого слова',
                    parse_mode='html', reply_markup=markup2)
     bot.register_next_step_handler(msg, lening)
@@ -97,7 +101,7 @@ def lening(message):
     shadow_form_word = '*' * int(message.text)
     conceived_word = ' '
     while len(conceived_word) != int(message.text):
-        conceived_word = word_rus[random.randint(0, 1000)]
+        conceived_word = word_rus[random.randint(0, len(word_rus) - 1)]
     str_conceived_word = ''
     len_of_word = len(conceived_word)
     critical_trie = 10
@@ -116,28 +120,40 @@ def lening(message):
     msg = bot.send_message(message.chat.id, '*' * int(message.text))
     guessed_letters = []
     guessed_words = []
-    conceived_word = list(conceived_word)
+    conceived_word = list(conceived_word.lower())
     for i in range(len(conceived_word)):
         str_conceived_word += conceived_word[i]
     shadow_form_word = list(shadow_form_word)
     bot.register_next_step_handler(msg, gm21)
 def gm21(message):
     global critical_trie
-    if message.text in conceived_word:
+    if message.text.lower() in conceived_word:
         for j in range(len(conceived_word)):
             if conceived_word[j].lower() == message.text.lower():
-                shadow_form_word[j] = message.text
+                shadow_form_word[j] = message.text.lower()
         bot.send_message(message.chat.id, ''.join(shadow_form_word))
         if shadow_form_word == conceived_word:
             bot.send_message(message.chat.id, 'Ура! Вы выиграли!')
-        msg = bot.send_message(message.chat.id,'Вводите')
-        bot.register_next_step_handler(msg,gm21)
+            restart(message)
+        else:
+            msg = bot.send_message(message.chat.id,'Вводите')
+            bot.register_next_step_handler(msg,gm21)
     else:
         critical_trie -= 1
-        bot.send_message(message.chat.id, f'У вас осталось {critical_trie} жизней')
+        bot.send_message(message.chat.id, f'У Вас осталось {critical_trie} жизней')
         if critical_trie != 0:
             msg = bot.send_message(message.chat.id,'Вводите')
             bot.register_next_step_handler(msg, gm21)
         else:
             bot.send_message(message.chat.id, f'Вы проиграли, это было слово "{str_conceived_word}"')
+            restart(message)
+def restart(message):
+    markup1 = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    item1 = types.KeyboardButton('/1')
+    item2 = types.KeyboardButton('/2')
+    item3 = types.KeyboardButton('/rules')
+
+    markup1.add(item1, item2, item3)
+    bot.send_message(message.chat.id,'Хотите ли Вы сыграть еще раз? Вы хотите играть с определением слова или наугад? Выберите /1, если Вы хотите играть с определением и /2, если Вы хотите играть без определения, если вы хотите ознакомиться более подробно с правилами, то выберите /rules.',parse_mode='html', reply_markup = markup1)
+
 bot.polling(none_stop=True)
